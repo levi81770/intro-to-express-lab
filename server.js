@@ -28,16 +28,17 @@ const shoes = [
 // routes
 
 // Exercise 1
-app.get('/greetings/username', (req, res) => {
+app.get('/greetings/:username', (req, res) => {
     res.send(`Hello there, ${req.params.username}!`)
 })
 
 // Exercise 2
-app.get('/roll/num', (req, res) => {
+app.get('/roll/:num', (req, res) => {
     if (isNaN(req.params.num)) {
         res.send('You must specify a number.')
     } else {
-        const roll = Math.floor(Math.random() * req.params.num)
+        const num = Number(req.params.num)
+        const roll = Math.floor(Math.random() * (num + 1))
         res.send(`You rolled a ${roll}.`)
     }
 })
@@ -48,40 +49,22 @@ app.get('/collectibles/:index', (req, res) => {
     if (!collectibles[index]) {
         res.send('This item is not yet in stock. Check back soon!')
     } else {
-        res.send(`So, you want the ${collectibles[index].name}? That will be ${collectibles[index].price}.`)
+        res.send(`So, you want the ${collectibles[index].name}? That will be $${collectibles[index].price}.`)
     }
 })
 
 // Exercise 4
 app.get('/shoes', (req, res) => {
-    const minPrice = parseInt(req.query.minPrice)
-    const maxPrice = parseInt(req.query.maxPrice)
+    const minPrice = Number(req.query['min-price'])
+    const maxPrice = Number(req.query['max-price'])
     const type = req.query.type;
-    if (!minPrice && !maxPrice && !type) {
-         res.send(shoes)
-    }else if (minPrice && !maxPrice && !type) {
-        let filteredShoes = shoes.filter(shoe => shoe.price >= minPrice)
-        res.send(filteredShoes)
-    } else if (!minPrice && maxPrice && !type) {
-        let filteredShoes = shoes.filter(shoe => shoe.price <= maxPrice)
-        res.send(filteredShoes)
-    } else if (!minPrice && !maxPrice && type) {
-        let filteredShoes = shoes.filter(shoe => shoe.type === type)
-        res.send(filteredShoes)
-    } else if (minPrice && maxPrice && !type) {
-        let filteredShoes = shoes.filter(shoe => shoe.price >= minPrice && shoe.price <= maxPrice)
-        res.send(filteredShoes)
-    } else if (minPrice && !maxPrice && type) {
-        let filteredShoes = shoes.filter(shoe => shoe.price >= minPrice && shoe.type === type)
-        res.send(filteredShoes)
-    } else if (!minPrice && maxPrice && type) {
-        let filteredShoes = shoes.filter(shoe => shoe.price <= maxPrice && shoe.type === type)
-        res.send(filteredShoes)
-    } else {
-        let filteredShoes = shoes.filter(shoe => shoe.price >= minPrice && shoe.price <= maxPrice && shoe.type === type)
-        res.send(filteredShoes)
-    } 
 
+    let filteredShoes = shoes;
+    if (minPrice) filteredShoes = filteredShoes.filter(shoe => shoe.price >= minPrice)
+    if (maxPrice) filteredShoes = filteredShoes.filter(shoe => shoe.price <= maxPrice)
+    if (type) filteredShoes = filteredShoes.filter(shoe => shoe.type === type)
+
+    res.send(filteredShoes)
 })
 
 //listen
